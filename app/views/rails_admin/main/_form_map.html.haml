@@ -30,16 +30,23 @@
         updateLocation(e.latLng);
       });
 
-      jQuery("##{field.address_dom_name},##{field.city_dom_name},##{field.state_dom_name}").on("keyup", function(){
+      jQuery("##{field.address_dom_name},##{field.city_dom_name},##{field.state_dom_name}").on("change", function(){
         clearTimeout($.data(this, 'timer'));
         $(this).data('timer', setTimeout(processAddress, 1000));
       });
-
+      function processParam(selector){
+        var $field = $(selector);
+        if($field.is('select')){
+          return $field.find("option:selected").text();
+        } else {
+          return $field.val();
+        }
+      }
       function processAddress() {
         // geocode based on this location
-        var address = $("##{field.address_dom_name}").val(),
-        city = $("##{field.city_dom_name}").val() || false,
-        state = $("##{field.state_dom_name}").val() || false,
+        var address = processParam("##{field.address_dom_name}"),
+        city = processParam("##{field.city_dom_name}") || false,
+        state = processParam("##{field.state_dom_name}") || false,
         address_string = "",
         changed = false;
 
@@ -67,6 +74,9 @@
 
         jQuery("##{field.latitude_dom_name}").val(location.lat());
         jQuery("##{field.longitude_dom_name}").val(location.lng());
+      }
+      if(jQuery("##{field.latitude_dom_name}").val() == '' || jQuery("##{field.longitude_dom_name}").val() == ''){
+        setTimeout(processAddress, 1000);
       }
 
     });
